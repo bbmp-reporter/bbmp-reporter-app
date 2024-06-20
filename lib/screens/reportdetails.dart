@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bbmp_reporter/constants/cloud.dart';
 import 'package:bbmp_reporter/constants/location.dart';
 import 'package:bbmp_reporter/constants/prefernces.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -33,9 +34,6 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
 
   @override
   void initState() {
-    LocationHelper().getCurrentCoordinates().then((position){
-      data['location'] = [position.latitude, position.longitude];
-    });
     getDetails();
     getLocationFuture = getLocation();
     super.initState();
@@ -43,7 +41,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
 
   Future<Position> getLocation() async {
     Position position = await LocationHelper().getCurrentCoordinates();
-    data['location'] = [position.latitude, position.longitude];
+    data['location'] = GeoPoint(position.latitude, position.longitude);
     return position;
   }
 

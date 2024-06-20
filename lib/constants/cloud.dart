@@ -16,6 +16,7 @@ class FirebaseHelper {
     String fileName = DateTime.timestamp().toString();
     Reference reference = FirebaseStorage.instance.ref('uploads/$fileName');
     Future uploadFileFuture = reference.putFile(image);
+    await uploadFileFuture;
 
     String imageUrl = await reference.getDownloadURL();
     data['image'] = imageUrl;

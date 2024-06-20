@@ -21,11 +21,15 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController locationController = TextEditingController();
+  late Future<Position> getLocationFuture;
 
   Map<String, dynamic> data = {
     'name': 'Loading...',
     'phone': 'Loading...',
   };
+
+  bool isUploading = false;
+
 
   @override
   void initState() {
@@ -33,6 +37,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
       data['location'] = [position.latitude, position.longitude];
     });
     getDetails();
+    getLocationFuture = getLocation();
     super.initState();
   }
 
@@ -63,54 +68,72 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
           Padding(
             padding: const EdgeInsets.all(30.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("DETAILS", style: TextStyle(fontSize: 30.0),),
-                const SizedBox(height: 30,),
-                const Text("Name", style: TextStyle(fontSize: 20.0),),
-                TextField(
-                  controller: nameController,
+                SizedBox(
+                  height: 400,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("DETAILS", style: TextStyle(fontSize: 30.0),),
+                      const SizedBox(height: 30,),
+                      const Text("Name", style: TextStyle(fontSize: 20.0),),
+                      TextField(
+                        controller: nameController,
+                      ),
+                      const SizedBox(height: 20,),
+                      const Text("Phone", style: TextStyle(fontSize: 20.0),),
+                      TextField(
+                        controller: phoneController,
+                      ),
+                      const SizedBox(height: 20,),
+                      const Text("Address", style: TextStyle(fontSize: 20.0),),
+                      FutureBuilder(
+                          future: getLocationFuture,
+                          builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+                            if(snapshot.connectionState != ConnectionState.done){
+                              return const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: CircularProgressIndicator(color: Colors.black,),
+                              );
+                            }
+                            locationController.text = "Current location";
+                            return TextField(
+                              controller: locationController,
+                            );
+                          }
+                      ),
+                      const SizedBox(height: 30,),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 20,),
-                const Text("Phone", style: TextStyle(fontSize: 20.0),),
-                TextField(
-                  controller: phoneController,
-                ),
-                const SizedBox(height: 20,),
-                const Text("Address", style: TextStyle(fontSize: 20.0),),
-                FutureBuilder(
-                    future: getLocation(),
-                    builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
-                      if(snapshot.connectionState != ConnectionState.done){
-                        return const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: CircularProgressIndicator(),
-                        );
-                      }
-                      locationController.text = "Current location";
-                      return TextField(
-                        controller: locationController,
-                      );
-                    }
-                ),
-                SizedBox(height: 30,),
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                    onTap: (){
+                    onTap: () async {
+                      if(isUploading){
+                        return;
+                      }
+                      setState(() {
+                        isUploading = true;
+                      });
                       data['timestamp'] = DateTime.timestamp();
-                      FirebaseHelper().uploadReport(data, widget.image);
+                      await FirebaseHelper().uploadReport(data, widget.image);
+                      setState(() {
+                        isUploading = false;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Reported successfully!")));
+                      Navigator.pop(context);
                     },
                     child: Container(
                       decoration: const BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.all(Radius.circular(99)),
                       ),
-                      child: const SizedBox(
+                      child: SizedBox(
                         width: 200,
                         height: 45,
                         child: Center(
-                          child: Text("Upload report", style: TextStyle(color: Colors.white),),
+                          child: !isUploading ? const Text("Upload report", style: TextStyle(color: Colors.white),) : const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white,)),
                         ),
                       ),
                     ),

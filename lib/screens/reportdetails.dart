@@ -114,7 +114,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
                       setState(() {
                         isUploading = true;
                       });
-                      data['timestamp'] = DateTime.timestamp();
+                      data['timestamp'] = Timestamp.fromDate(DateTime.now());
                       await FirebaseHelper().uploadReport(data, widget.image);
                       setState(() {
                         isUploading = false;

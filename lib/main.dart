@@ -1,14 +1,24 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:bbmp_reporter/constants/prefernces.dart';
 import 'package:bbmp_reporter/homescreen.dart';
 import 'package:bbmp_reporter/screens/detailsscreen.dart';
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'constants/globals.dart';
+
+const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+const _nums = '1234567890';
+Random _rnd = Random();
+
+String getRandomString(int length, String space) => String.fromCharCodes(Iterable.generate(
+    length, (_) => space.codeUnitAt(_rnd.nextInt(space.length))));
 
 Future<void> main() async {
 
@@ -24,12 +34,40 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
+GeoPoint generateRandomPoint(GeoPoint center, double radiusInMeters) {
+  final random = Random();
+
+  final angle = random.nextDouble() * 2 * pi;
+
+  final distance = sqrt(random.nextDouble()) * radiusInMeters;
+
+  final deltaLat = distance * cos(angle) / 111320; // 111320 meters is approximately 1 degree latitude
+  final deltaLng = distance * sin(angle) / (111320 * cos(center.latitude * pi / 180));
+
+  return GeoPoint(center.latitude + deltaLat, center.longitude + deltaLng);
+
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    Map<String, dynamic> data = {
+      'name': 'Loading...',
+      'phone': 'Loading...',
+    };
+
+    // for(int i = 0; i<50; i++){
+    //   data['name'] = getRandomString(10, _chars);
+    //   data['phone'] = getRandomString(10, _nums);
+    //   data['timestamp'] = Timestamp.fromDate(DateTime.now().subtract(Duration(hours: Random().nextInt(48), minutes: Random().nextInt(60))));
+    //   data['image'] = "https://firebasestorage.googleapis.com/v0/b/bbmp-reporter.appspot.com/o/uploads%2F1G1coOShW2?alt=media&token=77433578-ea93-45fb-906d-7de429b15280";
+    //   data['location'] = generateRandomPoint(const GeoPoint(12.97, 77.59), 8000);
+    //   FirebaseFirestore.instance.collection('reports').doc().set(data);
+    // }
 
     return MaterialApp(
       title: 'BBMP Reporter',

@@ -51,23 +51,29 @@ GeoPoint generateRandomPoint(GeoPoint center, double radiusInMeters) {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
+
+  void fillers(){
 
     Map<String, dynamic> data = {
       'name': 'Loading...',
       'phone': 'Loading...',
     };
 
-    // for(int i = 0; i<50; i++){
-    //   data['name'] = getRandomString(10, _chars);
-    //   data['phone'] = getRandomString(10, _nums);
-    //   data['timestamp'] = Timestamp.fromDate(DateTime.now().subtract(Duration(hours: Random().nextInt(48), minutes: Random().nextInt(60))));
-    //   data['image'] = "https://firebasestorage.googleapis.com/v0/b/bbmp-reporter.appspot.com/o/uploads%2F1G1coOShW2?alt=media&token=77433578-ea93-45fb-906d-7de429b15280";
-    //   data['location'] = generateRandomPoint(const GeoPoint(12.97, 77.59), 8000);
-    //   FirebaseFirestore.instance.collection('reports').doc().set(data);
-    // }
+    for(int i = 0; i<50; i++){
+      data['name'] = getRandomString(10, _chars);
+      data['phone'] = getRandomString(10, _nums);
+      data['timestamp'] = Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 50 - i, minutes:120 - (i * 2))));
+      data['image'] = "https://firebasestorage.googleapis.com/v0/b/bbmp-reporter.appspot.com/o/uploads%2FvLuSv3lphs.jpg?alt=media&token=0a4a5edd-86a8-4cbc-a827-cff8d63454b5";
+      data['location'] = generateRandomPoint(const GeoPoint(12.97, 77.59), 8000);
+      FirebaseFirestore.instance.collection('reports').doc().set(data);
+    }
+  }
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+
+    // fillers();
 
     return MaterialApp(
       title: 'BBMP Reporter',

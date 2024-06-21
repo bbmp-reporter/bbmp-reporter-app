@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bbmp_reporter/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as p;
 
 class FirebaseHelper {
   static final FirebaseHelper _instance = FirebaseHelper._internal();
@@ -15,7 +16,8 @@ class FirebaseHelper {
   FirebaseHelper._internal();
 
   Future<bool> uploadReport(Map<String, dynamic> data, File image) async {
-    String fileName = getRandomString(10, _chars);
+
+    String fileName = "${getRandomString(10, _chars)}${p.extension(image.path)}";
     Reference reference = FirebaseStorage.instance.ref('uploads/$fileName');
     Future uploadFileFuture = reference.putFile(image);
     await uploadFileFuture;

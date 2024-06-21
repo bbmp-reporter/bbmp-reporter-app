@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
@@ -14,6 +16,14 @@ class LocalStorage {
 
   Future<void> initialize() async {
     _storage = await SharedPreferences.getInstance();
+  }
+
+  Map<String, dynamic> getDetails() {
+    String? details = LocalStorage().storage.get('details') as String?;
+    if(details == null){
+      return {"isEmployee": null};
+    }
+    return jsonDecode(details as String);
   }
 
 }

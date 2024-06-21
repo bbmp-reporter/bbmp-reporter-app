@@ -16,6 +16,8 @@ class _DetailScreenState extends State<DetailScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
+  bool isBBMPEmployee = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +39,17 @@ class _DetailScreenState extends State<DetailScreen> {
             TextField(
               controller: phoneController,
             ),
+            const SizedBox(height: 20,),
+            Row(
+              children: [
+                const Text("BBMP Employee?", style: TextStyle(fontSize: 20.0),),
+                Checkbox(value: isBBMPEmployee, onChanged: (value){
+                  setState(() {
+                    isBBMPEmployee = value!;
+                  });
+                })
+              ],
+            )
           ],
         ),
       ),
@@ -55,8 +68,9 @@ class _DetailScreenState extends State<DetailScreen> {
             'phone': phoneController.text,
           };
           LocalStorage().storage.setString("details", jsonEncode(details));
+          LocalStorage().storage.setBool("isEmployee", isBBMPEmployee);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Details saved successfully.')));
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const HomeScreen()));
+          Navigator.of(context).pop();
         },
         child: Container(
           padding: const EdgeInsets.all(20),
@@ -64,7 +78,7 @@ class _DetailScreenState extends State<DetailScreen> {
             color: Colors.black,
             borderRadius: BorderRadius.all(Radius.circular(99))
           ),
-          child: const Icon(Icons.navigate_next),
+          child: const Icon(Icons.navigate_next, color: Colors.white,),
         ),
       ),
     );

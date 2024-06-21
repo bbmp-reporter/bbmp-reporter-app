@@ -96,26 +96,21 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: FutureBuilder<bool>(
-        future: verifyDetails(),
+        future: verifyDetails(context),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           if(snapshot.connectionState != ConnectionState.done){
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
-          if(snapshot.data == true){
-            return const HomeScreen();
-          }
-          else{
-            return const DetailScreen();
-          }
+          return const HomeScreen();
         }
       )
     );
   }
 }
 
-Future<bool> verifyDetails() async {
+Future<bool> verifyDetails(context) async {
   SharedPreferences storage = await SharedPreferences.getInstance();
   String? detailsRaw = storage.getString("details");
   if(detailsRaw == null){
@@ -123,9 +118,11 @@ Future<bool> verifyDetails() async {
   }
   Map<String, dynamic> detailsParsed = jsonDecode(detailsRaw);
   if(!detailsParsed.containsKey('name')){
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DetailScreen()));
     return false;
   }
   if(!detailsParsed.containsKey('phone')){
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DetailScreen()));
     return false;
   }
   return true;

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:bbmp_reporter/constants/location.dart';
@@ -31,6 +32,8 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
 
   MapController mapController = MapController();
 
+  bool showNotification = true;
+
   @override
   void initState() {
     LocationHelper().getCurrentCoordinates().then((position){
@@ -57,6 +60,12 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
             if(LocationHelper().calculateDistance(location.latitude, location.longitude, currentPosition!.latitude, currentPosition!.longitude) < 2){
               reports.add(doc.data());
               selectedPoint = location;
+              showNotification = true;
+              Timer(Duration(seconds: 5), (){
+                setState(() {
+                  showNotification = false;
+                });
+              });
             }
             processedDocIds.add(doc.id);
           }
@@ -86,9 +95,6 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            color: Colors.black,
-          ),
           FlutterMap(
             mapController: mapController,
             options: MapOptions(
@@ -154,7 +160,7 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
                             itemCount: reports.length,
                             itemBuilder: (context, index) {
                               return Container(
-                                padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                                 child: Column(
                                   children: [
                                     Row(
@@ -164,7 +170,7 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
                                           children: [
                                             Text("Reported by", style: headingStyle,),
                                             Text(reports[index]['name']),
-                                            SizedBox(height: 5,),
+                                            const SizedBox(height: 5,),
                                             Text("Timestamp", style: headingStyle,),
                                             Text(DateFormat('MMM dd h:mm a').format((reports[index]['timestamp'] as Timestamp).toDate())),
                                           ],
@@ -175,7 +181,7 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
                                           children: [
                                             Text("Phone", style: headingStyle,),
                                             Text(reports[index]['phone']),
-                                            SizedBox(height: 5,),
+                                            const SizedBox(height: 5,),
                                             Row(
                                               children: [
                                                 GestureDetector(
@@ -185,7 +191,7 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
                                                       mapController.move(LatLng(selectedPoint.latitude, selectedPoint.longitude), 16);
                                                     });
                                                   },
-                                                  child: Icon(Icons.location_pin),
+                                                  child: const Icon(Icons.location_pin),
                                                 ),
                                                 GestureDetector(
                                                   onTap: () async {
@@ -193,7 +199,7 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
                                                       throw Exception('Could not launch url');
                                                     }
                                                   },
-                                                  child: Icon(Icons.camera_enhance_rounded),
+                                                  child: const Icon(Icons.camera_enhance_rounded),
                                                 )
                                               ],
                                             ),
@@ -211,7 +217,7 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
                                         )
                                       ],
                                     ),
-                                    Divider(),
+                                    const Divider(),
                                   ],
                                 ),
                               );
@@ -221,6 +227,27 @@ class _NearbyTrashScreenState extends State<NearbyTrashScreen> {
                   ),
                 );
               }
+          ),
+          if(showNotification) Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(20),
+              height: 100,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20))
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("New Report!", style: TextStyle(fontSize: 20),),
+                  SizedBox(height: 5,),
+                  Text("Someone uploaded a new reported nearby!", style: TextStyle(fontSize: 15),),
+                ],
+              ),
+            ),
           )
         ],
       ),

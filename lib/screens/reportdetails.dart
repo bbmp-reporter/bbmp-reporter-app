@@ -5,6 +5,7 @@ import 'package:bbmp_reporter/constants/cloud.dart';
 import 'package:bbmp_reporter/constants/location.dart';
 import 'package:bbmp_reporter/constants/prefernces.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -115,7 +116,22 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
                         isUploading = true;
                       });
                       data['timestamp'] = Timestamp.fromDate(DateTime.now());
-                      await FirebaseHelper().uploadReport(data, widget.image);
+                      Future reportUploadFuture = FirebaseHelper().uploadReport(data, widget.image);
+                      // Future<QuerySnapshot> notificationFuture = FirebaseFirestore.instance.collection('users').where('isEmployee', isEqualTo: false).get();
+                      //
+                      // List<String> fcmList = [];
+                      //
+                      // notificationFuture.then((QuerySnapshot snapshot){
+                      //   snapshot.docs.forEach((QueryDocumentSnapshot document){
+                      //     fcmList.add(document.get('fcmToken'));
+                      //     FirebaseMessaging.instance.
+                      //   });
+                      // });
+
+
+
+                      await Future.wait([reportUploadFuture]);
+
                       setState(() {
                         isUploading = false;
                       });

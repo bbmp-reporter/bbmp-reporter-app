@@ -47,7 +47,7 @@ dependencies:
   flutter_map: ^6.0.1
   flutter_map_heatmap: ^0.0.7
   url_launcher: ^6.3.0
-  firebase_messaging: ^15.0.1
+  firebase_messaging: ^15.0.0
 
 dev_dependencies:
   flutter_test:

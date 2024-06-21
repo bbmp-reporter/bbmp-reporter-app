@@ -6,8 +6,8 @@ import 'package:bbmp_reporter/homescreen.dart';
 import 'package:bbmp_reporter/screens/detailsscreen.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -27,6 +27,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final notificationSettings = await FirebaseMessaging.instance.requestPermission(provisional: true);
 
   cameras = await availableCameras();
   await LocalStorage().initialize();
